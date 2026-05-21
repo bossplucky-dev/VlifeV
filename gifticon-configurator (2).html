@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기프티콘 결합상품 구성 — 기업 전용</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F4F0;--surface:#FFFFFF;--surface2:#F0EFE9;
+  --border:rgba(0,0,0,0.09);--border-med:rgba(0,0,0,0.15);
+  --text:#1A1917;--text-sub:#6B6963;--text-hint:#A09D97;
+  --accent:#1A1917;--blue:#2563EB;--blue-light:#EFF6FF;
+  --green:#16A34A;--green-light:#F0FDF4;
+  --r:12px;--rl:16px;--rxl:20px;
+}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-logo{font-size:16px;font-weight:700;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px}
+.header-logo span{width:28px;height:28px;background:var(--accent);border-radius:7px;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700}
+.header-badge{font-size:11px;background:var(--surface2);border:1px solid var(--border);padding:4px 12px;border-radius:20px;color:var(--text-sub);font-weight:500}
+.layout{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 60px)}
+.left-panel{padding:32px 36px;overflow-y:auto}
+.right-panel{background:var(--surface);border-left:1px solid var(--border);padding:28px 24px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;display:flex;flex-direction:column;gap:0}
+
+/* Steps */
+.step-section{margin-bottom:32px}
+.step-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-title{font-size:16px;font-weight:600;letter-spacing:-0.01em}
+.step-sub{font-size:12px;color:var(--text-sub);margin-top:3px}
+.divider{height:1px;background:var(--border);margin-bottom:32px}
+
+/* Progress */
+.progress-steps{display:flex;align-items:center;margin-bottom:32px}
+.p-step{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-hint);font-weight:500;flex:1}
+.p-step.active{color:var(--text)}
+.p-step.done{color:var(--green)}
+.p-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--border-med);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;background:var(--surface);color:var(--text-hint)}
+.p-step.active .p-dot{border-color:var(--text);color:var(--text)}
+.p-step.done .p-dot{border-color:var(--green);background:var(--green);color:white}
+.p-line{flex:1;height:1px;background:var(--border-med);margin:0 4px;max-width:24px}
+
+/* Brand grid */
+.brand-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:9px}
+.brand-card{border:1.5px solid var(--border);border-radius:var(--r);padding:13px 8px 11px;cursor:pointer;text-align:center;background:var(--surface);transition:border-color .15s,transform .1s;position:relative;user-select:none}
+.brand-card:hover{border-color:var(--border-med);transform:translateY(-1px)}
+.brand-card.selected{border-color:var(--blue);background:var(--blue-light)}
+.brand-card.disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.brand-logo{width:44px;height:44px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin:0 auto 7px;font-size:12px;font-weight:700}
+.brand-name{font-size:11px;font-weight:600;color:var(--text)}
+.brand-cat{font-size:10px;color:var(--text-hint);margin-top:1px}
+.check-badge{position:absolute;top:6px;right:6px;width:17px;height:17px;border-radius:50%;background:var(--blue);display:none;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:700}
+.brand-card.selected .check-badge{display:flex}
+.sel-counter{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.sel-count-text{font-size:13px;font-weight:500;color:var(--text-sub)}
+.sel-pips{display:flex;gap:5px}
+.sel-pip{width:24px;height:5px;border-radius:3px;background:var(--border-med);transition:background .2s}
+.sel-pip.filled{background:var(--blue)}
+
+/* Amount */
+.amount-row{display:flex;gap:8px;flex-wrap:wrap}
+.amount-chip{padding:7px 16px;border-radius:24px;border:1.5px solid var(--border-med);font-size:13px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--text-sub);transition:all .12s}
+.amount-chip:hover{border-color:var(--text);color:var(--text)}
+.amount-chip.active{background:var(--accent);color:white;border-color:var(--accent)}
+
+/* Upload */
+.upload-box{border:1.5px dashed var(--border-med);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;background:var(--surface);transition:border-color .15s}
+.upload-box:hover{border-color:var(--text)}
+.upload-box.has-logo{border-style:solid;border-color:var(--blue);background:var(--blue-light)}
+.upload-preview-wrap{display:none;justify-content:center;align-items:center;margin-bottom:8px;max-height:80px}
+.upload-preview-wrap img{max-width:100%;max-height:80px;border-radius:6px;object-fit:contain;border:1px solid var(--border)}
+.upload-icon{font-size:28px;color:var(--text-hint);margin-bottom:6px}
+.upload-text{font-size:13px;font-weight:500;color:var(--text-sub)}
+.upload-hint{font-size:11px;color:var(--text-hint);margin-top:4px}
+.input-wrap{margin-top:10px}
+.input-wrap label{font-size:12px;font-weight:500;color:var(--text-sub);display:block;margin-bottom:5px}
+.input-wrap input{width:100%;padding:9px 13px;border:1.5px solid var(--border-med);border-radius:8px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;transition:border-color .15s}
+.input-wrap input:focus{border-color:var(--blue)}
+
+/* Message tabs */
+.msg-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
+.msg-tab{padding:8px 16px;font-size:13px;font-weight:500;color:var(--text-hint);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap}
+.msg-tab:hover{color:var(--text-sub)}
+.msg-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.msg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.msg-card{border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:border-color .15s,transform .1s;position:relative}
+.msg-card:hover{border-color:var(--border-med);transform:translateY(-1px)}
+.msg-card.selected{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-light)}
+.msg-thumb{width:100%;height:58px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;letter-spacing:-0.01em;padding:6px 8px;text-align:center;line-height:1.4}
+.msg-label{padding:5px 8px;font-size:10px;color:var(--text-hint);background:var(--surface);font-weight:500}
+.msg-check{position:absolute;top:5px;right:5px;width:16px;height:16px;border-radius:50%;background:var(--blue);display:none;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700}
+.msg-card.selected .msg-check{display:flex}
+.custom-msg-wrap{margin-top:12px}
+.custom-msg-wrap label{font-size:12px;font-weight:500;color:var(--text-sub);display:block;margin-bottom:5px}
+.custom-msg-wrap textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border-med);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;resize:none;transition:border-color .15s;height:68px;line-height:1.6}
+.custom-msg-wrap textarea:focus{border-color:var(--blue)}
+
+/* Quantity */
+.qty-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.qty-btn{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border-med);background:var(--surface);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-sub);transition:background .12s}
+.qty-btn:hover{background:var(--surface2)}
+.qty-input{width:80px;text-align:center;padding:8px;border:1.5px solid var(--border-med);border-radius:8px;font-size:16px;font-weight:600;font-family:inherit;outline:none;transition:border-color .15s}
+.qty-input:focus{border-color:var(--blue)}
+.qty-label{font-size:13px;color:var(--text-sub)}
+.total-box{background:var(--surface2);border-radius:var(--r);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.total-label{font-size:13px;color:var(--text-sub)}
+.total-amount{font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--text)}
+.total-amount span{font-size:13px;font-weight:400;color:var(--text-sub);margin-left:3px}
+
+/* Right panel voucher */
+.preview-title{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text-hint);text-transform:uppercase;margin-bottom:16px}
+.voucher{background:var(--surface);border-radius:var(--rxl);border:1px solid var(--border);overflow:hidden;width:100%;max-width:300px;margin:0 auto}
+.voucher-header{background:var(--accent);padding:18px 20px 14px;color:white;position:relative;overflow:hidden}
+.voucher-header::after{content:'';position:absolute;right:-20px;top:-20px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.05)}
+.v-company-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;position:relative}
+.v-company-logo{width:44px;height:32px;border-radius:7px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.6);overflow:hidden;flex-shrink:0}
+.v-company-logo img{width:100%;height:100%;object-fit:contain;padding:2px}
+.v-company-name{font-size:14px;font-weight:600;color:white}
+.v-label{font-size:10px;color:rgba(255,255,255,0.55);margin-top:1px}
+.v-amount-num{font-size:26px;font-weight:700;color:white;letter-spacing:-0.02em}
+.v-amount-unit{font-size:13px;font-weight:400;color:rgba(255,255,255,0.7);margin-left:2px}
+.voucher-msg{padding:10px 16px;border-bottom:1px solid var(--border);min-height:38px;display:flex;align-items:center}
+.v-msg-img{width:100%;height:44px;object-fit:cover;border-radius:4px;display:none}
+.v-msg-text{font-size:12px;color:var(--text-sub);font-style:italic}
+.voucher-brands{padding:14px 16px;border-bottom:1px solid var(--border)}
+.v-brands-label{font-size:10px;color:var(--text-hint);font-weight:500;margin-bottom:9px;letter-spacing:.04em}
+.v-brand-slots{display:flex;gap:7px}
+.v-slot{flex:1;border:1px solid var(--border);border-radius:9px;padding:9px 5px 7px;text-align:center;background:var(--surface);min-height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.v-slot.empty{border-style:dashed}
+.v-slot-logo{width:34px;height:34px;border-radius:7px;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.v-slot-name{font-size:9px;font-weight:600;color:var(--text-sub);line-height:1.3}
+.v-slot-empty{font-size:9px;color:var(--border-med);text-align:center;line-height:1.4}
+.voucher-footer{padding:12px 18px}
+.v-code{font-size:10px;color:var(--text-hint);font-family:'Courier New',monospace;letter-spacing:.05em;margin-bottom:9px}
+.v-barcode{height:30px;border-radius:2px;overflow:hidden;display:flex;gap:2px;margin-bottom:9px}
+.v-bar{flex-shrink:0;background:var(--text);opacity:.12}
+.v-meta{display:flex;justify-content:space-between}
+.v-exp{font-size:10px;color:var(--text-hint)}
+.v-type{font-size:10px;font-weight:600;color:var(--text-hint)}
+
+/* Summary */
+.summary-section{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.summary-row:last-of-type{border-bottom:none}
+.summary-label{color:var(--text-sub)}
+.summary-val{font-weight:500;color:var(--text)}
+.summary-total-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:14px;border-top:2px solid var(--text);margin-top:4px}
+.summary-total-label{font-weight:600}
+.summary-total-val{font-size:18px;font-weight:700;letter-spacing:-0.02em}
+.btn-generate{width:100%;padding:13px;border-radius:var(--r);background:var(--accent);color:white;border:none;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:14px;transition:opacity .15s,transform .1s;letter-spacing:-0.01em}
+.btn-generate:disabled{opacity:.3;cursor:not-allowed}
+.btn-generate:not(:disabled):hover{opacity:.85}
+.btn-generate:not(:disabled):active{transform:scale(0.98)}
+.btn-reset{width:100%;padding:9px;border-radius:var(--r);background:transparent;color:var(--text-sub);border:1px solid var(--border-med);font-size:13px;font-family:inherit;cursor:pointer;margin-top:7px;transition:background .12s}
+.btn-reset:hover{background:var(--surface2)}
+
+/* Success modal */
+.success-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.45);align-items:center;justify-content:center}
+.success-overlay.show{display:flex}
+.success-modal{background:var(--surface);border-radius:var(--rxl);padding:36px 32px;max-width:420px;width:92%;text-align:center}
+.success-icon{width:52px;height:52px;border-radius:50%;background:var(--green-light);color:var(--green);font-size:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.success-title{font-size:20px;font-weight:700;margin-bottom:8px;letter-spacing:-0.02em}
+.success-sub{font-size:13px;color:var(--text-sub);line-height:1.6;margin-bottom:20px}
+.success-details{background:var(--surface2);border-radius:var(--r);padding:14px 18px;text-align:left;margin-bottom:20px}
+.success-detail-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)}
+.success-detail-row:last-child{border-bottom:none}
+.sd-label{color:var(--text-sub)}
+.sd-val{font-weight:600;color:var(--text)}
+.success-btn{width:100%;padding:13px;background:var(--accent);color:white;border:none;border-radius:var(--r);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+.success-btn-outline{width:100%;padding:10px;margin-top:8px;background:transparent;color:var(--text-sub);border:1px solid var(--border-med);border-radius:var(--r);font-size:13px;font-family:inherit;cursor:pointer}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .right-panel{position:static;height:auto;border-left:none;border-top:1px solid var(--border);padding:24px 20px 32px}
+  .left-panel{padding:24px 20px}
+  .header{padding:0 20px}
+}
+@media(max-width:480px){
+  .brand-grid{grid-template-columns:repeat(3,1fr)}
+  .msg-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo"><span>G</span> GiftLink B2B</div>
+  <div class="header-badge">기업 구매팀 전용 포털</div>
+</header>
+
+<div class="layout">
+<div class="left-panel">
+
+  <!-- Progress -->
+  <div class="progress-steps">
+    <div class="p-step active" id="ps1"><div class="p-dot">1</div>브랜드</div>
+    <div class="p-line"></div>
+    <div class="p-step" id="ps2"><div class="p-dot">2</div>금액</div>
+    <div class="p-line"></div>
+    <div class="p-step" id="ps3"><div class="p-dot">3</div>회사정보</div>
+    <div class="p-line"></div>
+    <div class="p-step" id="ps4"><div class="p-dot">4</div>메시지</div>
+    <div class="p-line"></div>
+    <div class="p-step" id="ps5"><div class="p-dot">5</div>수량·발주</div>
+  </div>
+
+  <!-- Step 1: Brand -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div><div class="step-title">브랜드 선택</div><div class="step-sub">결합상품에 포함할 브랜드를 최대 3개 선택하세요</div></div>
+    </div>
+    <div class="sel-counter">
+      <div class="sel-count-text" id="sel-count-text">0 / 3 선택</div>
+      <div class="sel-pips"><div class="sel-pip" id="pip1"></div><div class="sel-pip" id="pip2"></div><div class="sel-pip" id="pip3"></div></div>
+    </div>
+    <div class="brand-grid" id="brand-grid"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 2: Amount -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div><div class="step-title">금액권 설정</div><div class="step-sub">1인당 발행 금액을 선택하세요</div></div>
+    </div>
+    <div class="amount-row" id="amount-row">
+      <div class="amount-chip" data-val="3000">3,000원</div>
+      <div class="amount-chip" data-val="5000">5,000원</div>
+      <div class="amount-chip active" data-val="10000">10,000원</div>
+      <div class="amount-chip" data-val="15000">15,000원</div>
+      <div class="amount-chip" data-val="20000">20,000원</div>
+      <div class="amount-chip" data-val="30000">30,000원</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 3: Company info -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div><div class="step-title">회사 정보 입력</div><div class="step-sub">로고와 회사명이 상품권에 표시됩니다</div></div>
+    </div>
+    <div class="upload-box" id="upload-box" onclick="document.getElementById('logo-input').click()">
+      <div class="upload-preview-wrap" id="upload-preview-wrap"><img id="upload-preview-img" alt="로고 미리보기"></div>
+      <div id="upload-icon" class="upload-icon">↑</div>
+      <div class="upload-text" id="upload-text">클릭하여 회사 로고 업로드</div>
+      <div class="upload-hint">PNG · JPG · SVG — 가로형 로고 포함 자동 리사이징</div>
+    </div>
+    <input type="file" id="logo-input" accept="image/*" style="display:none">
+    <div class="input-wrap" style="margin-top:12px">
+      <label for="company-name-input">회사명</label>
+      <input type="text" id="company-name-input" placeholder="예: 삼성전자" oninput="updateCompanyName(this.value)">
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 4: Message -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div><div class="step-title">메시지 선택</div><div class="step-sub">상품권에 함께 발송할 이미지 메시지를 선택하세요</div></div>
+    </div>
+    <div class="msg-tabs" id="msg-tabs"></div>
+    <div class="msg-grid" id="msg-grid"></div>
+    <div class="custom-msg-wrap">
+      <label for="custom-msg">직접 입력 메시지 (선택)</label>
+      <textarea id="custom-msg" placeholder="추가로 전달할 메시지를 입력하세요..." oninput="updateCustomMsg(this.value)"></textarea>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 5: Quantity -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div><div class="step-title">수량 및 결제금액</div><div class="step-sub">발행할 상품권 수량을 입력하세요</div></div>
+    </div>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="changeQty(-1)">−</button>
+      <input type="number" class="qty-input" id="qty-input" value="10" min="1" max="9999" oninput="updateQty(this.value)">
+      <button class="qty-btn" onclick="changeQty(1)">+</button>
+      <span class="qty-label">매</span>
+    </div>
+    <div class="total-box">
+      <div class="total-label">총 결제금액</div>
+      <div class="total-amount" id="total-amount">100,000<span>원</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Right panel -->
+<div class="right-panel">
+  <div class="preview-title">실시간 미리보기</div>
+  <div class="voucher" id="voucher">
+    <div class="voucher-header">
+      <div class="v-company-row">
+        <div class="v-company-logo" id="v-logo"><span style="font-size:13px">🏢</span></div>
+        <div>
+          <div class="v-company-name" id="v-company-name">회사명</div>
+          <div class="v-label">임직원 전용 복지 상품권</div>
+        </div>
+      </div>
+      <div><span class="v-amount-num" id="v-amount">10,000</span><span class="v-amount-unit">원</span></div>
+    </div>
+    <div class="voucher-msg" id="voucher-msg">
+      <span class="v-msg-text" id="v-msg-text">메시지를 선택하세요</span>
+    </div>
+    <div class="voucher-brands">
+      <div class="v-brands-label">사용 가능 브랜드</div>
+      <div class="v-brand-slots" id="v-brand-slots">
+        <div class="v-slot empty"><div class="v-slot-empty">브랜드<br>미선택</div></div>
+        <div class="v-slot empty"><div class="v-slot-empty">브랜드<br>미선택</div></div>
+        <div class="v-slot empty"><div class="v-slot-empty">브랜드<br>미선택</div></div>
+      </div>
+    </div>
+    <div class="voucher-footer">
+      <div class="v-code" id="v-code">GFT-XXXX-XXXX-XXXX</div>
+      <div class="v-barcode" id="v-barcode"></div>
+      <div class="v-meta">
+        <div class="v-exp">유효기간: 발행일로부터 1년</div>
+        <div class="v-type">MOBILE VOUCHER</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-section">
+    <div class="summary-row"><span class="summary-label">선택 브랜드</span><span class="summary-val" id="sum-brands">—</span></div>
+    <div class="summary-row"><span class="summary-label">1인당 금액</span><span class="summary-val" id="sum-amount">10,000원</span></div>
+    <div class="summary-row"><span class="summary-label">메시지</span><span class="summary-val" id="sum-msg">—</span></div>
+    <div class="summary-row"><span class="summary-label">수량</span><span class="summary-val" id="sum-qty">10매</span></div>
+    <div class="summary-total-row">
+      <span class="summary-total-label">총 결제금액</span>
+      <span class="summary-total-val" id="sum-total">100,000원</span>
+    </div>
+    <button class="btn-generate" id="btn-generate" disabled onclick="handleGenerate()">발주 접수하기</button>
+    <button class="btn-reset" onclick="handleReset()">초기화</button>
+  </div>
+</div>
+</div>
+
+<!-- Success Modal -->
+<div class="success-overlay" id="success-overlay" onclick="closeSuccess(event)">
+  <div class="success-modal">
+    <div class="success-icon">✓</div>
+    <div class="success-title">발주 접수 완료</div>
+    <div class="success-sub">아래 내용으로 상품권 발주가 접수되었습니다.<br>담당 MD에게 확인 연락이 전송됩니다.</div>
+    <div class="success-details" id="success-details"></div>
+    <button class="success-btn" onclick="closeSuccess()">확인</button>
+    <button class="success-btn-outline" onclick="closeSuccess()">닫기</button>
+  </div>
+</div>
+
+<script>
+const BRANDS = [
+  {id:'paris',   name:'파리바게뜨',   cat:'베이커리',   color:'#C41230', bg:'#FEE8EB', initials:'PB'},
+  {id:'baskin',  name:'배스킨라빈스', cat:'아이스크림', color:'#E8297A', bg:'#FDE8F2', initials:'BR'},
+  {id:'daiso',   name:'다이소',       cat:'생활용품',   color:'#E8380D', bg:'#FDE8E4', initials:'DS'},
+  {id:'compose', name:'컴포즈커피',   cat:'커피',       color:'#A07B00', bg:'#FFF9D6', initials:'CP'},
+  {id:'mega',    name:'메가커피',     cat:'커피',       color:'#E05A00', bg:'#FFF0E4', initials:'MG'},
+  {id:'kfc',     name:'KFC',          cat:'패스트푸드', color:'#C8102E', bg:'#FDEBEE', initials:'KF'},
+  {id:'subway',  name:'써브웨이',     cat:'샌드위치',   color:'#007832', bg:'#E4F6EC', initials:'SW'},
+  {id:'hollys',  name:'할리스커피',   cat:'커피',       color:'#6B3300', bg:'#F5EBE0', initials:'HL'},
+  {id:'twosome', name:'투썸플레이스', cat:'카페',       color:'#1A1A1A', bg:'#F0F0F0', initials:'TP'},
+  {id:'ediya',   name:'이디야커피',   cat:'커피',       color:'#003087', bg:'#E8EEF8', initials:'ED'},
+];
+
+const MSG_CATEGORIES = [
+  {id:'thanks', label:'감사'},
+  {id:'congrats', label:'축하'},
+  {id:'birthday', label:'생일'},
+  {id:'cheer', label:'격려'},
+  {id:'holiday', label:'명절'},
+  {id:'season', label:'시즌'},
+];
+
+const MESSAGES = [
+  {id:'t1',cat:'thanks',text:'감사의 마음을\n전합니다.',bg:'linear-gradient(135deg,#FFF0E8,#FFD6C0)',color:'#8B3A1A',label:'감사 01'},
+  {id:'t2',cat:'thanks',text:'항상 감사합니다.',bg:'linear-gradient(135deg,#E8F4E8,#C8E6C8)',color:'#1B5E20',label:'감사 02'},
+  {id:'t3',cat:'thanks',text:'고맙습니다 ☺',bg:'linear-gradient(135deg,#E3F2FD,#BBDEFB)',color:'#0D47A1',label:'감사 03'},
+  {id:'t4',cat:'thanks',text:'성원에 감사드립니다.',bg:'linear-gradient(135deg,#F3E5F5,#E1BEE7)',color:'#4A148C',label:'감사 04'},
+  {id:'c1',cat:'congrats',text:'축하드립니다! 🎉',bg:'linear-gradient(135deg,#FFF9C4,#FFF176)',color:'#F57F17',label:'축하 01'},
+  {id:'c2',cat:'congrats',text:'진심으로\n축하합니다.',bg:'linear-gradient(135deg,#FCE4EC,#F8BBD0)',color:'#880E4F',label:'축하 02'},
+  {id:'b1',cat:'birthday',text:'생일을 진심으로\n축하합니다 🎂',bg:'linear-gradient(135deg,#FFF3E0,#FFE0B2)',color:'#E65100',label:'생일 01'},
+  {id:'b2',cat:'birthday',text:'Happy Birthday! 🎁',bg:'linear-gradient(135deg,#E8EAF6,#C5CAE9)',color:'#1A237E',label:'생일 02'},
+  {id:'ch1',cat:'cheer',text:'힘내세요! 응원합니다 💪',bg:'linear-gradient(135deg,#E0F7FA,#B2EBF2)',color:'#006064',label:'격려 01'},
+  {id:'ch2',cat:'cheer',text:'걱정하지 마세요\n잘 될 거예요!',bg:'linear-gradient(135deg,#E1F5FE,#B3E5FC)',color:'#01579B',label:'격려 02'},
+  {id:'h1',cat:'holiday',text:'명절 잘 보내세요 🎊',bg:'linear-gradient(135deg,#FFF8E1,#FFECB3)',color:'#FF6F00',label:'명절 01'},
+  {id:'h2',cat:'holiday',text:'즐거운 명절\n되세요.',bg:'linear-gradient(135deg,#F1F8E9,#DCEDC8)',color:'#33691E',label:'명절 02'},
+  {id:'s1',cat:'season',text:'행복한 연말\n보내세요 ⛄',bg:'linear-gradient(135deg,#E8EAF6,#C5CAE9)',color:'#283593',label:'시즌 01'},
+  {id:'s2',cat:'season',text:'따뜻한 계절\n보내세요 🌸',bg:'linear-gradient(135deg,#FCE4EC,#F8BBD0)',color:'#880E4F',label:'시즌 02'},
+];
+
+let selected = [];
+let selectedAmount = 10000;
+let logoDataUrl = null;
+let companyName = '';
+let selectedMsgId = null;
+let customMsg = '';
+let quantity = 10;
+let activeMsgCat = 'thanks';
+
+function renderBrands() {
+  const grid = document.getElementById('brand-grid');
+  grid.innerHTML = '';
+  BRANDS.forEach(b => {
+    const isSel = selected.includes(b.id);
+    const isDisabled = !isSel && selected.length >= 3;
+    const card = document.createElement('div');
+    card.className = 'brand-card' + (isSel?' selected':'') + (isDisabled?' disabled':'');
+    card.innerHTML = `<div class="check-badge">✓</div><div class="brand-logo" style="background:${b.bg};color:${b.color}">${b.initials}</div><div class="brand-name">${b.name}</div><div class="brand-cat">${b.cat}</div>`;
+    if (!isDisabled) card.onclick = () => toggleBrand(b.id);
+    grid.appendChild(card);
+  });
+  document.getElementById('sel-count-text').textContent = selected.length + ' / 3 선택';
+  for (let i=1;i<=3;i++) document.getElementById('pip'+i).classList.toggle('filled', i <= selected.length);
+  updateVoucherBrands();
+  updateSummary();
+  checkReady();
+  updateProgress();
+}
+
+function toggleBrand(id) {
+  if (selected.includes(id)) selected = selected.filter(x=>x!==id);
+  else if (selected.length < 3) selected.push(id);
+  renderBrands();
+}
+
+function updateVoucherBrands() {
+  const slots = document.getElementById('v-brand-slots');
+  slots.innerHTML = '';
+  for (let i=0;i<3;i++) {
+    const slot = document.createElement('div');
+    const b = selected[i] ? BRANDS.find(x=>x.id===selected[i]) : null;
+    if (b) {
+      slot.className = 'v-slot filled';
+      slot.innerHTML = `<div class="v-slot-logo" style="background:${b.bg};color:${b.color}">${b.initials}</div><div class="v-slot-name">${b.name}</div>`;
+    } else {
+      slot.className = 'v-slot empty';
+      slot.innerHTML = `<div class="v-slot-empty">브랜드<br>미선택</div>`;
+    }
+    slots.appendChild(slot);
+  }
+}
+
+function renderMsgTabs() {
+  const tabs = document.getElementById('msg-tabs');
+  tabs.innerHTML = '';
+  MSG_CATEGORIES.forEach(cat => {
+    const tab = document.createElement('div');
+    tab.className = 'msg-tab' + (cat.id === activeMsgCat ? ' active' : '');
+    tab.textContent = cat.label;
+    tab.onclick = () => { activeMsgCat = cat.id; renderMsgTabs(); renderMsgGrid(); };
+    tabs.appendChild(tab);
+  });
+}
+
+function renderMsgGrid() {
+  const grid = document.getElementById('msg-grid');
+  grid.innerHTML = '';
+  MESSAGES.filter(m=>m.cat===activeMsgCat).forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'msg-card' + (selectedMsgId===m.id?' selected':'');
+    card.innerHTML = `
+      <div class="msg-check">✓</div>
+      <div class="msg-thumb" style="background:${m.bg};color:${m.color}">${m.text.replace(/\n/g,'<br>')}</div>
+      <div class="msg-label">${m.label}</div>`;
+    card.onclick = () => { selectedMsgId = m.id; renderMsgGrid(); updateVoucherMsg(); updateSummary(); updateProgress(); };
+    grid.appendChild(card);
+  });
+}
+
+function updateVoucherMsg() {
+  const msgEl = document.getElementById('v-msg-text');
+  if (selectedMsgId) {
+    const m = MESSAGES.find(x=>x.id===selectedMsgId);
+    if (m) {
+      const voucherMsg = document.getElementById('voucher-msg');
+      voucherMsg.style.background = m.bg;
+      msgEl.style.color = m.color;
+      msgEl.style.fontStyle = 'normal';
+      msgEl.style.fontWeight = '600';
+      msgEl.style.fontSize = '12px';
+      msgEl.innerHTML = m.text.replace(/\n/g,'<br>');
+      return;
+    }
+  }
+  const voucherMsg = document.getElementById('voucher-msg');
+  voucherMsg.style.background = '';
+  msgEl.style.color = '';
+  msgEl.style.fontStyle = 'italic';
+  msgEl.style.fontWeight = '';
+  msgEl.innerHTML = customMsg || '메시지를 선택하세요';
+}
+
+function updateCustomMsg(val) {
+  customMsg = val;
+  if (!selectedMsgId) updateVoucherMsg();
+  updateSummary();
+}
+
+function updateQty(val) {
+  quantity = Math.max(1, Math.min(9999, parseInt(val)||1));
+  document.getElementById('qty-input').value = quantity;
+  updateTotals();
+}
+
+function changeQty(delta) {
+  quantity = Math.max(1, Math.min(9999, quantity + delta));
+  document.getElementById('qty-input').value = quantity;
+  updateTotals();
+}
+
+function updateTotals() {
+  const total = selectedAmount * quantity;
+  document.getElementById('total-amount').innerHTML = total.toLocaleString() + '<span>원</span>';
+  updateSummary();
+}
+
+function updateCompanyName(val) {
+  companyName = val;
+  document.getElementById('v-company-name').textContent = val || '회사명';
+}
+
+function updateSummary() {
+  const brandNames = selected.map(id=>BRANDS.find(b=>b.id===id)?.name).filter(Boolean);
+  document.getElementById('sum-brands').textContent = brandNames.length ? brandNames.join(', ') : '—';
+  document.getElementById('sum-amount').textContent = selectedAmount.toLocaleString() + '원';
+  const msgObj = selectedMsgId ? MESSAGES.find(m=>m.id===selectedMsgId) : null;
+  document.getElementById('sum-msg').textContent = msgObj ? msgObj.label : (customMsg ? '직접입력' : '—');
+  document.getElementById('sum-qty').textContent = quantity.toLocaleString() + '매';
+  document.getElementById('sum-total').textContent = (selectedAmount * quantity).toLocaleString() + '원';
+  document.getElementById('v-amount').textContent = selectedAmount.toLocaleString();
+}
+
+function checkReady() {
+  document.getElementById('btn-generate').disabled = selected.length < 3;
+}
+
+function updateProgress() {
+  const states = [
+    selected.length === 3,
+    true,
+    !!companyName || !!logoDataUrl,
+    !!selectedMsgId,
+    quantity > 0,
+  ];
+  ['ps1','ps2','ps3','ps4','ps5'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done');
+    if (states[i]) el.classList.add('done');
+    else if (!states.slice(0,i).some(s=>!s)) el.classList.add('active');
+  });
+}
+
+function renderBarcode() {
+  const bc = document.getElementById('v-barcode');
+  bc.innerHTML = '';
+  [3,2,4,1,3,2,1,4,2,3,1,3,2,4,1,2,3,1,4,2,3,2,1,3,2,4,1,3].forEach(w=>{
+    const bar = document.createElement('div');
+    bar.className = 'v-bar'; bar.style.width = w+'px'; bc.appendChild(bar);
+  });
+  const code = 'GFT-'+rnd(4)+'-'+rnd(4)+'-'+rnd(4);
+  document.getElementById('v-code').textContent = code;
+}
+
+function rnd(n){ return Math.random().toString(36).slice(2,2+n).toUpperCase(); }
+
+document.getElementById('amount-row').querySelectorAll('.amount-chip').forEach(chip=>{
+  chip.onclick = () => {
+    document.querySelectorAll('.amount-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    selectedAmount = parseInt(chip.dataset.val);
+    updateTotals();
+  };
+});
+
+document.getElementById('logo-input').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    logoDataUrl = ev.target.result;
+    const pw = document.getElementById('upload-preview-wrap');
+    const pi = document.getElementById('upload-preview-img');
+    pi.src = logoDataUrl; pw.style.display = 'flex';
+    document.getElementById('upload-icon').style.display = 'none';
+    document.getElementById('upload-text').textContent = '로고 업로드 완료 — 다시 클릭하여 변경';
+    document.getElementById('upload-box').classList.add('has-logo');
+    const vLogo = document.getElementById('v-logo');
+    vLogo.innerHTML = `<img src="${logoDataUrl}" alt="로고" style="width:100%;height:100%;object-fit:contain;padding:2px;border-radius:6px">`;
+    if (!companyName) {
+      companyName = file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+      document.getElementById('company-name-input').value = companyName;
+      document.getElementById('v-company-name').textContent = companyName;
+    }
+    updateSummary(); updateProgress();
+  };
+  reader.readAsDataURL(file);
+});
+
+function handleGenerate() {
+  const brandNames = selected.map(id=>BRANDS.find(b=>b.id===id)?.name).join(', ');
+  const msgObj = selectedMsgId ? MESSAGES.find(m=>m.id===selectedMsgId) : null;
+  document.getElementById('success-details').innerHTML = `
+    <div class="success-detail-row"><span class="sd-label">회사명</span><span class="sd-val">${companyName||'(미입력)'}</span></div>
+    <div class="success-detail-row"><span class="sd-label">선택 브랜드</span><span class="sd-val">${brandNames}</span></div>
+    <div class="success-detail-row"><span class="sd-label">1인당 금액</span><span class="sd-val">${selectedAmount.toLocaleString()}원</span></div>
+    <div class="success-detail-row"><span class="sd-label">메시지</span><span class="sd-val">${msgObj?msgObj.label:(customMsg?'직접입력':'없음')}</span></div>
+    <div class="success-detail-row"><span class="sd-label">수량</span><span class="sd-val">${quantity.toLocaleString()}매</span></div>
+    <div class="success-detail-row"><span class="sd-label">총 결제금액</span><span class="sd-val">${(selectedAmount*quantity).toLocaleString()}원</span></div>
+  `;
+  document.getElementById('success-overlay').classList.add('show');
+}
+
+function closeSuccess(e) {
+  if (!e || e.target===document.getElementById('success-overlay') || !e.target.closest) {
+    document.getElementById('success-overlay').classList.remove('show');
+  }
+}
+
+function handleReset() {
+  selected=[]; logoDataUrl=null; companyName=''; selectedMsgId=null; customMsg=''; quantity=10; selectedAmount=10000; activeMsgCat='thanks';
+  document.getElementById('upload-preview-wrap').style.display='none';
+  document.getElementById('upload-icon').style.display='block';
+  document.getElementById('upload-text').textContent='클릭하여 회사 로고 업로드';
+  document.getElementById('upload-box').classList.remove('has-logo');
+  document.getElementById('logo-input').value='';
+  document.getElementById('v-logo').innerHTML='<span style="font-size:13px">🏢</span>';
+  document.getElementById('company-name-input').value='';
+  document.getElementById('custom-msg').value='';
+  document.getElementById('qty-input').value=10;
+  document.getElementById('voucher-msg').style.background='';
+  document.getElementById('v-msg-text').style.cssText='';
+  document.getElementById('v-msg-text').innerHTML='메시지를 선택하세요';
+  document.querySelectorAll('.amount-chip').forEach((c,i)=>c.classList.toggle('active',i===2));
+  renderBrands(); renderMsgTabs(); renderMsgGrid(); updateTotals(); renderBarcode();
+}
+
+renderBrands();
+renderMsgTabs();
+renderMsgGrid();
+updateTotals();
+renderBarcode();
+</script>
+</body>
+</html>
