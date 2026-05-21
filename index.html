@@ -116,8 +116,9 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .voucher-header{background:var(--accent);padding:18px 20px 14px;color:white;position:relative;overflow:hidden}
 .voucher-header::after{content:'';position:absolute;right:-20px;top:-20px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.05)}
 .v-company-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;position:relative}
-.v-company-logo{width:120px;height:36px;border-radius:7px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.6);overflow:hidden;flex-shrink:0}
-.v-company-logo img{width:100%;height:100%;object-fit:contain;padding:4px;filter:brightness(0) invert(1)}
+.v-company-logo{width:130px;height:40px;border-radius:7px;background:#FFFFFF;border:none;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;padding:4px 8px}
+.v-company-logo img{width:100%;height:100%;object-fit:contain}
+.v-company-logo .logo-placeholder{font-size:9px;color:#999}
 .v-company-name{font-size:14px;font-weight:600;color:white}
 .v-label{font-size:10px;color:rgba(255,255,255,0.55);margin-top:1px}
 .v-amount-num{font-size:26px;font-weight:700;color:white;letter-spacing:-0.02em}
@@ -303,7 +304,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   <div class="voucher" id="voucher">
     <div class="voucher-header">
       <div class="v-company-row">
-        <div class="v-company-logo" id="v-logo"><span style="font-size:13px">🏢</span></div>
+        <div class="v-company-logo" id="v-logo"><span class="logo-placeholder">회사 로고</span></div>
         <div>
           <div class="v-company-name" id="v-company-name">회사명</div>
           <div class="v-label">임직원 전용 복지 상품권</div>
@@ -642,7 +643,7 @@ function handleReset() {
   document.getElementById('upload-text').textContent='클릭하여 회사 로고 업로드';
   document.getElementById('upload-box').classList.remove('has-logo');
   document.getElementById('logo-input').value='';
-  document.getElementById('v-logo').innerHTML='<span style="font-size:13px">🏢</span>';
+  document.getElementById('v-logo').innerHTML='<span class="logo-placeholder">회사 로고</span>';
   document.getElementById('company-name-input').value='';
   document.getElementById('custom-msg').value='';
   document.getElementById('qty-input').value=10;
